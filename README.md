@@ -1,5 +1,7 @@
 # Fennec
 
+<img src="logo.jpeg" width=400px align='center'>
+
 ## Fennec Command and Control (C2) framework with three components: a victim agent, a server, and a control app. The victim connects to the server, and the control app manages the victim through the server.
 
 ## Requirements
