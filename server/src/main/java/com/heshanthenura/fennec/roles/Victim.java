@@ -1,4 +1,4 @@
-package com.heshanthenura;
+package com.heshanthenura.fennec.roles;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +8,7 @@ import java.net.Socket;
 
 public class Victim {
     private String id;
+    private String nickname;
     private Socket socket;
     private PrintWriter printWriter;
     private BufferedReader bufferedReader;
