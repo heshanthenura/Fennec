@@ -17,14 +17,14 @@ public class WebSocketServer {
 
     @OnOpen
     public void onConnect(Session session) {
-        clients.add(session); // Add client to active sessions
+        clients.add(session);
         System.out.println("New client connected: " + session.getId());
         sendToClient(session, "Welcome! Your session ID is: " + session.getId());
     }
 
     @OnClose
     public void onDisconnect(Session session) {
-        clients.remove(session); // Remove client from active sessions
+        clients.remove(session);
         System.out.println("Client disconnected: " + session.getId());
     }
 
@@ -43,7 +43,7 @@ public class WebSocketServer {
 
     private void sendToClient(Session session, String message) {
         try {
-            session.getBasicRemote().sendText(message); // Send message to client
+            session.getBasicRemote().sendText(message); 
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -53,7 +53,7 @@ public class WebSocketServer {
         for (Session client : clients) {
             try {
                 if (client.isOpen()) {
-                    client.getBasicRemote().sendText(message); // Send to each client
+                    client.getBasicRemote().sendText(message);
                 }
             } catch (IOException e) {
                 e.printStackTrace();

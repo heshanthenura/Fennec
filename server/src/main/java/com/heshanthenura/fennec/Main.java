@@ -9,7 +9,7 @@ public class Main {
         try {
             server.start();
             System.out.println("WebSocket server started on ws://localhost:8080/");
-            System.in.read();  // Keep the server running
+            System.in.read();
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
