@@ -1,15 +1,24 @@
-import std/net, std/socketstreams, strutils, os, asyncdispatch, logging
+import asyncdispatch, ws, json
 
-proc connectToServer(host: string, port: Port) =
-  var socket = newSocket(AF_INET, SOCK_STREAM, IPPROTO_TCP)
-  socket.connect(host, port)
+proc main() {.async.} =
   
-  while true:
-    let receivedString =  socket.recvLine()
-    if receivedString.len > 0:
-      echo "Received: ", receivedString
+  var ws = await newWebSocket("ws://192.168.1.101:8080/ws")
+  echo "Connected to WebSocket server!"
 
-when isMainModule:
-  let host = "127.0.0.1"
-  let port = Port(8080)
-  connectToServer(host, port)
+  # Send a JSON message immediately after the connection is established
+  var jsonObj = %* {"type": "set_role", "role": "victim"}
+  let jsonMessage = $jsonObj
+  await ws.send(jsonMessage)
+  echo "Sent message: ", jsonMessage
+
+  while true:
+    let message = await ws.receiveStrPacket()
+    echo "Received message: ", message
+
+    # Wait for 5 seconds before sending another message
+    await sleepAsync(5000)
+
+  ws.close()
+  echo "WebSocket connection closed."
+
+waitFor main()

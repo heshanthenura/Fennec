@@ -15,6 +15,8 @@ dependencies {
     implementation 'org.java-websocket:Java-WebSocket:1.5.2'
     implementation 'org.slf4j:slf4j-api:1.7.32'  // Add this line
     implementation 'org.slf4j:slf4j-simple:1.7.32'  // Add this line for simple logging implementation
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.0'
+
 }
 
 test {
