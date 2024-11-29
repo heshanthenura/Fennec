@@ -43,7 +43,7 @@ public class Commands {
         response.put("client", client);
         response.put("victim", victim);
         response.put("command",command);
-        
+
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.writeValueAsString(response);
