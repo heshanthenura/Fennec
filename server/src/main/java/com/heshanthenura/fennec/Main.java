@@ -8,7 +8,7 @@ public class Main {
 
         try {
             server.start();
-            System.out.println("WebSocket server started on ws://localhost:8080/");
+            System.out.println("WebSocket server started on ws://localhost:8080/ws");
             System.in.read();  // Keep the server running
         } catch (Exception e) {
             e.printStackTrace();
