@@ -31,8 +31,8 @@ public class WebSocketServer {
     @OnMessage
     public void onMessage(String message, Session session) {
         System.out.println("Received from client " + session.getId() + ": " + message);
-        sendToClient(session, "Echo: " + message);
-        broadcast("Client " + session.getId() + " says: " + message);
+        // sendToClient(session, "Echo: " + message);
+        // broadcast("Client " + session.getId() + " says: " + message);
     }
 
     @OnError
