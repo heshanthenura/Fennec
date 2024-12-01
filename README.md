@@ -1,4 +1,4 @@
-# Fennec
+# Fennec (under development)
 
 <p align="center">
 <img align='center' src="logo.jpeg" width=400px >
