@@ -65,6 +65,7 @@ public class Commands {
 
             ObjectNode response = mapper.createObjectNode();
             response.put("type", "exec");
+            response.put("state", "req");
             response.put("client_id", id);
             response.put("command", command);
             return response.toString();
@@ -74,6 +75,21 @@ public class Commands {
         }
     }
 
+    public String sendClientExec(String command,String data) {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+
+            ObjectNode response = mapper.createObjectNode();
+            response.put("type", "exec");
+            response.put("state", "res");
+            response.put("command", command);
+            response.put("data", data);
+            return response.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "{\"type\":\"error\",\"message\":\"Failed to generate JSON\"}";
+        }
+    }
 
 
 }
