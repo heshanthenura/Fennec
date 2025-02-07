@@ -11,3 +11,8 @@ bin           = @["victim"]
 # Dependencies
 
 requires "nim >= 2.0.2"
+requires "ws"
+requires "winim"
+requires "nimpng"
+requires "opencv"
+

