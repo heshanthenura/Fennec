@@ -1,10 +1,15 @@
 package com.heshanthenura.fennec;
 
+import java.awt.image.BufferedImage;
+import java.io.*;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import javax.imageio.ImageIO;
 
 public class Commands {
 
@@ -50,6 +55,17 @@ public class Commands {
         } catch (Exception e) {
             e.printStackTrace();
             return "{\"status\": \"error\", \"message\": \"Failed to generate JSON\"}";
+        }
+    }
+
+    public void decodeImg(String b64) {
+        b64 = b64.replaceAll("[^A-Za-z0-9+/=]", "");
+        byte[] decodedBytes = Base64.getDecoder().decode(b64);
+        try (FileOutputStream fos = new FileOutputStream("decoded_image.png")) {
+            fos.write(decodedBytes);
+            System.out.println("Image successfully decoded and saved as decoded_image.png");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

