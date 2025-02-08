@@ -69,4 +69,15 @@ public class Commands {
         }
     }
 
+    public void decodeCam(String b64) {
+        b64 = b64.replaceAll("[^A-Za-z0-9+/=]", "");
+        byte[] decodedBytes = Base64.getDecoder().decode(b64);
+        try (FileOutputStream fos = new FileOutputStream("decoded_image.bmp")) {
+            fos.write(decodedBytes);
+            System.out.println("Image successfully decoded and saved as decoded_image.bmp");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

